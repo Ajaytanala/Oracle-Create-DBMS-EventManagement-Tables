@@ -1,0 +1,83 @@
+CREATE TABLE Employee ( 
+  empNo      CHAR(11)     NOT NULL, 
+  empName    VARCHAR(30)  NOT NULL, 
+  department VARCHAR(30)  NOT NULL, 
+  email      VARCHAR(255) NOT NULL, 
+  phone      VARCHAR(30)  NOT NULL, 
+  CONSTRAINT EmployeePK PRIMARY KEY (empNo) 
+);
+
+CREATE TABLE Customer ( 
+  custNo   CHAR(8)     NOT NULL, 
+  custName VARCHAR(30) NOT NULL, 
+  address  VARCHAR(50) NOT NULL, 
+  internal CHAR(1)     NOT NULL, 
+  city     VARCHAR(30) NOT NULL, 
+  zip      VARCHAR(10) NOT NULL, 
+  state    VARCHAR(2)  NOT NULL, 
+  contact  VARCHAR(50) NOT NULL, 
+  phone    VARCHAR(30) NOT NULL, 
+  CONSTRAINT CustomerPk PRIMARY KEY (custNo) 
+);
+
+CREATE TABLE Facility ( 
+  facNo   CHAR(11)    NOT NULL, 
+  facName VARCHAR(30) NOT NULL, 
+  CONSTRAINT FacilityPK PRIMARY KEY (facNo) 
+);
+
+CREATE TABLE ResourceTbl ( 
+resNo CHAR(8) NOT NULL, 
+resName VARCHAR(30) NOT NULL, 
+rate DECIMAL(8, 2) NOT NULL, 
+CONSTRAINT PK_ResourceTbl PRIMARY KEY (resNo) 
+);
+
+CREATE TABLE eventrequest( 
+eventno VARCHAR(8) NOT NULL, 
+dateheld DATE NOT NULL, 
+datereq DATE NOT NULL, 
+facno CHAR(11) NOT NULL, 
+custno CHAR(8) NOT NULL, 
+dateauth DATE, 
+status VARCHAR(8) NOT NULL CHECK (status IN ('Pending','Denied','Approved')), 
+estcost DECIMAL(10, 2) NOT NULL, 
+estaudience INT NOT NULL CHECK (estaudience > 0), 
+budno VARCHAR(8), 
+CONSTRAINT pkEventNo PRIMARY KEY (eventno), 
+CONSTRAINT fkFacNoEventReq FOREIGN KEY (facno) REFERENCES facility (facno), 
+CONSTRAINT fkCustNo FOREIGN KEY (custno) REFERENCES customer (custno) 
+);
+
+CREATE TABLE Location ( 
+  locNo   CHAR(8)     NOT NULL, 
+  facNo   CHAR(8)     NOT NULL, 
+  locName VARCHAR(30) NOT NULL, 
+  CONSTRAINT LocationPK PRIMARY KEY (locNo), 
+  CONSTRAINT FacilityFK FOREIGN KEY (facNo) REFERENCES Facility (facNo) 
+);
+
+CREATE TABLE eventplan(
+planno VARCHAR(8) NOT NULL,
+eventno VARCHAR(8) NOT NULL,
+workdate DATE NOT NULL,
+notes VARCHAR(40),
+activity VARCHAR(20) NOT NULL,
+empno VARCHAR(8),
+CONSTRAINT pkPlanNo PRIMARY KEY (planno),
+CONSTRAINT fkEventNo FOREIGN KEY (eventno) REFERENCES eventrequest (eventno)
+);
+
+CREATE TABLE EventPlanLine (
+planNo VARCHAR(8) NOT NULL,
+lineNo CHAR(8) NOT NULL,
+locNo CHAR(8) NOT NULL,
+resNo CHAR(8) NOT NULL,
+timeStart TIMESTAMP NOT NULL,
+timeEnd TIMESTAMP NOT NULL,
+numberFLD INTEGER NOT NULL,
+CONSTRAINT PK_EventPlanLine PRIMARY KEY (planNo, lineNo),
+CONSTRAINT FK_EventPlan FOREIGN KEY (planNo) REFERENCES EventPlan (planNo),
+CONSTRAINT FK_Location FOREIGN KEY (locNo) REFERENCES Location (locNo),
+CONSTRAINT FK_ResourceTbl FOREIGN KEY (resNo) REFERENCES ResourceTbl (resNo)
+);
